@@ -1,0 +1,299 @@
+{
+  "info": {
+    "_postman_id": "c1f7b889-1234-4567-89ab-cdef01234567",
+    "name": "Employee Management REST API",
+    "description": "Comprehensive Postman Collection covering all CRUD endpoints, statistics, departments, validation, pagination, sorting, search, filtering, and error scenarios.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "employeeId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create Employee (201 Created)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"jane.doe@example.com\",\n  \"department\": \"Engineering\",\n  \"salary\": 85000.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employees",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees"]
+        },
+        "description": "Creates a new employee with valid name, email, department, and salary."
+      }
+    },
+    {
+      "name": "2. Create Employee - Validation Error (400 Bad Request)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"email\": \"not-a-valid-email\",\n  \"department\": \"\",\n  \"salary\": -500.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employees",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees"]
+        },
+        "description": "Triggers validation error with empty name, malformed email, empty department, and negative salary."
+      }
+    },
+    {
+      "name": "3. Create Employee - Duplicate Email (409 Conflict)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Duplicate User\",\n  \"email\": \"jane.doe@example.com\",\n  \"department\": \"Sales\",\n  \"salary\": 60000.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employees",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees"]
+        },
+        "description": "Attempts to register an employee with an email that is already registered."
+      }
+    },
+    {
+      "name": "4. Get All Employees - Paginated, Sorted & Filtered (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees?page=0&size=10&sortBy=name&direction=asc&search=&department=",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0",
+              "description": "Zero-based page index"
+            },
+            {
+              "key": "size",
+              "value": "10",
+              "description": "Number of records per page (max 100)"
+            },
+            {
+              "key": "sortBy",
+              "value": "name",
+              "description": "Field to sort by (id, name, email, department, salary, createdAt, updatedAt)"
+            },
+            {
+              "key": "direction",
+              "value": "asc",
+              "description": "Sort direction ('asc' or 'desc')"
+            },
+            {
+              "key": "search",
+              "value": "",
+              "description": "Optional search keyword for name or email"
+            },
+            {
+              "key": "department",
+              "value": "",
+              "description": "Optional department filter"
+            }
+          ]
+        },
+        "description": "Retrieves paginated, sorted, and optionally filtered employees."
+      }
+    },
+    {
+      "name": "5. Get All Employees - Invalid Sort Field (400 Bad Request)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees?page=0&size=10&sortBy=invalidField&direction=asc",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees"],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "10"
+            },
+            {
+              "key": "sortBy",
+              "value": "invalidField"
+            },
+            {
+              "key": "direction",
+              "value": "asc"
+            }
+          ]
+        },
+        "description": "Verifies that sorting on a non-existent or disallowed field returns 400 Bad Request."
+      }
+    },
+    {
+      "name": "6. Get Real-Time Statistics (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/statistics",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "statistics"]
+        },
+        "description": "Retrieves aggregated statistics: total employees, distinct departments, average salary, and highest salary."
+      }
+    },
+    {
+      "name": "7. Get Distinct Departments (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/departments",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "departments"]
+        },
+        "description": "Retrieves the list of distinct active department names."
+      }
+    },
+    {
+      "name": "8. Get Employee by ID (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "{{employeeId}}"]
+        },
+        "description": "Retrieves employee details by ID."
+      }
+    },
+    {
+      "name": "9. Get Employee by ID - Not Found (404 Not Found)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/99999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "99999"]
+        },
+        "description": "Attempts to retrieve a non-existent employee ID."
+      }
+    },
+    {
+      "name": "10. Update Employee (200 OK)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Doe Updated\",\n  \"email\": \"jane.doe@example.com\",\n  \"department\": \"Senior Leadership\",\n  \"salary\": 98000.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "{{employeeId}}"]
+        },
+        "description": "Updates an existing employee. Note that preserving the same email address for the same employee is valid."
+      }
+    },
+    {
+      "name": "11. Update Employee - Duplicate Email Conflict (409 Conflict)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Jane Doe\",\n  \"email\": \"another.existing@example.com\",\n  \"department\": \"Engineering\",\n  \"salary\": 85000.00\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "{{employeeId}}"]
+        },
+        "description": "Attempts to update an employee's email to one already belonging to a different employee."
+      }
+    },
+    {
+      "name": "12. Delete Employee (204 No Content)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/{{employeeId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "{{employeeId}}"]
+        },
+        "description": "Deletes an employee by ID. Returns 204 No Content on success."
+      }
+    },
+    {
+      "name": "13. Delete Employee - Not Found (404 Not Found)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/employees/99999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "employees", "99999"]
+        },
+        "description": "Attempts to delete an employee that does not exist."
+      }
+    },
+    {
+      "name": "14. Actuator Health Check (200 OK)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/actuator/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["actuator", "health"]
+        },
+        "description": "Checks the application health status via Spring Boot Actuator."
+      }
+    }
+  ]
+}
